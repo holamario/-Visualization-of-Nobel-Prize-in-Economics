@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+</style>
+<body style="margin:0">
+    <script type="text/javascript" src="d3.js"></script>
+<script>
+var margin = {top: 100, right: 100, bottom: 100, left: 100},
+    width = 960 - margin.left - margin.right,
+    //height = 500 - margin.top - margin.bottom;
+    height=1500;
+
+var xscale = d3.scale.ordinal()
+    .domain(["","apple", "orange", "banana", "grapefruit"])
+    .rangePoints([0, width-300]);
+
+var xAxis = d3.svg.axis()
+    .scale(xscale)
+    .orient("top");
+var xvalue=function(d){return d.category};
+var xmap=function(d){return xscale(xvalue(d))};
+var yscale = d3.scale.linear()
+                        .domain([1969, 2015])
+                        .range([0, 1500]);
+
+var yAxis = d3.svg.axis()
+                .scale(yscale)
+                .orient("left").ticks(46);
+var yvalue=function(d){return d.year};
+var ymap=function(d){return yscale(yvalue(d))};
+
+var pic=function(d){return d.img};
+var man=function(d){return d.intro};
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.append("g")
+    .attr("class", "x axis")
+    .call(xAxis);
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+    
+var data2=[{'year':1990,'category':'apple','img':'1.png','intro':'normal man'},{'year':2005,'category':'banana','img':'2.png','intro':'good man'},{'year':1992,'category':'banana','img':'3.png','intro':'better man'},{'year':1980,'category':'orange','img':'4.png','intro':'best man'}];
+svg.selectAll(".dot").data(data2).enter().append("circle")
+.attr("class","dot").attr("r","25px").attr("cx",xmap).attr("cy",ymap).style("fill","steelblue").each(function(d,i){
+    var now=d3.select(this);
+    var avatar="<img src=\"uio.jpg\" alt=\"whom\">";
+    now.style("stroke","black").style("stroke-width",i*2+"px");
+    var imgurl=pic(d);
+    var defs=svg.append("defs").attr("id","imgdefs");
+    var catpattern=defs.append("pattern")
+                        .attr("id", "catpattern"+i)
+                        .attr("height", 50)
+                        .attr("width", 50)
+                        .attr("x", 0)
+                        .attr("y", 0);
+    catpattern.append("image")
+                .attr("id","image"+i)
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("height", 50)
+                .attr("width",50)
+                .attr("xlink:href", imgurl);
+     now.style("fill", "url(#catpattern"+i+")");
+     now.on("click",function(){
+         var x =document.getElementById("test");
+         x.innerHTML=man(d);
+     });
+     now.on("mouseover",function(){
+         //var y=document.getElementById("avatar");
+         //y.innerHTML=avatar;
+         now.transition().duration(1500).attr("r","50px");
+         d3.select("#image"+i).transition().duration(1500).attr("height", 100).attr("width",100);
+     });
+     now.on("mouseout",function(){
+         //var y=d3.select("#avatar");
+         //alert(y.html);
+         //y.transition().duration(1000).html("");
+         now.transition().duration(1500).attr("r","25px");
+         d3.select("#image"+i).transition().duration(1500).attr("height", 50).attr("width",50);
+     });
+     now.on("dblclick",function(){
+         var y=document.getElementById("avatar");
+         y.innerHTML=avatar;
+     })
+});
+
+</script>
+<div id="brief-intro" style="margin-left:625px;height:100vh;width:600px;background-color:rgba(0,0,0,0.9);margin-top:-1708px;position:fixed;padding:10px">
+    <h1 id="title" style="font-family:Hiragino Kaku Gothic Std;text-align:center;color:orange">諾貝爾經濟學獎大師一覽</h1>
+    <div id="avatar">hi</div>
+    <p id="test" style="color:white"></p>
+    <p>
+</div>
+</body>
